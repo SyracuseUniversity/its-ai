@@ -1,113 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello World</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Table</title>
   <style>
-    :root {
-      --bg: #0d0d0d;
-      --surface: #161616;
-      --accent: #c8f060;
-      --text: #f0ede6;
-      --muted: #555;
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
     body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .noise {
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .container {
-      position: relative;
-      z-index: 1;
-      text-align: center;
+      font-family: sans-serif;
       padding: 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
     }
 
-    .label {
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 1.5rem;
-      opacity: 0;
-      animation: fadeUp 0.6s ease 0.2s forwards;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
     }
 
-    h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(3.5rem, 10vw, 8rem);
-      line-height: 1;
-      letter-spacing: -0.02em;
-      opacity: 0;
-      animation: fadeUp 0.7s ease 0.4s forwards;
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
     }
 
-    h1 em {
-      font-style: italic;
-      color: var(--accent);
+    th {
+      background: #f4f4f4;
+      font-weight: 600;
     }
 
-    .divider {
-      width: 40px;
-      height: 1px;
-      background: var(--accent);
-      margin: 2rem auto;
-      opacity: 0;
-      animation: expand 0.5s ease 0.8s forwards;
-      transform-origin: left;
-      transform: scaleX(0);
+    tr:nth-child(even) {
+      background: #fafafa;
     }
 
-    .sub {
-      font-size: 0.95rem;
-      color: var(--muted);
-      letter-spacing: 0.05em;
-      opacity: 0;
-      animation: fadeUp 0.6s ease 1s forwards;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes expand {
-      from { opacity: 0; transform: scaleX(0); }
-      to   { opacity: 1; transform: scaleX(1); }
+    #status {
+      color: #888;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
-  <div class="noise"></div>
-  <div class="container">
-    <p class="label">Welcome to the web</p>
-    <h1>Hello, <em>World.</em></h1>
-    <div class="divider"></div>
-    <p class="sub">Your site starts here. Test merge</p>
-  </div>
+  <p id="status">Loading...</p>
+  <div id="table-container"></div>
+
+  <script>
+    async function loadTable() {
+      const status = document.getElementById("status");
+      const container = document.getElementById("table-container");
+
+      try {
+        const response = await fetch("data/spreadsheet.json");
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const records = await response.json();
+
+        if (!records.length) {
+          status.textContent = "No data found.";
+          return;
+        }
+
+        const headers = Object.keys(records[0]);
+        const table = document.createElement("table");
+
+        // Header row
+        const thead = table.createTHead();
+        const headerRow = thead.insertRow();
+        headers.forEach(h => {
+          const th = document.createElement("th");
+          th.textContent = h;
+          headerRow.appendChild(th);
+        });
+
+        // Data rows
+        const tbody = table.createTBody();
+        records.forEach(record => {
+          const row = tbody.insertRow();
+          headers.forEach(h => {
+            const cell = row.insertCell();
+            cell.textContent = record[h] ?? "";
+          });
+        });
+
+        container.appendChild(table);
+        status.textContent = `${records.length} rows loaded.`;
+
+      } catch (err) {
+        status.textContent = `Failed to load data: ${err.message}`;
+      }
+    }
+
+    loadTable();
+  </script>
 </body>
 </html>

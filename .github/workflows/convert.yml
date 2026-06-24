@@ -1,6 +1,7 @@
 name: Convert Excel to JSON
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - "data-lender/**.xlsx"

@@ -49,7 +49,7 @@
       const container = document.getElementById("table-container");
 
       try {
-        const response = await fetch("data/spreadsheet.json");
+        const response = await fetch("https://raw.githubusercontent.com/SyracuseUniversity/its-ai/main/data-lender/spreadsheet.json");
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const records = await response.json();

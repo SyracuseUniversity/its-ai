@@ -2,8 +2,8 @@ import pandas as pd
 import json
 import pathlib
 
-INPUT_PATH: pathlib.Path = pathlib.Path("data/spreadsheet.xlsx")
-OUTPUT_PATH: pathlib.Path = pathlib.Path("data/spreadsheet.json")
+INPUT_PATH: pathlib.Path = pathlib.Path("data-lender/spreadsheet.xlsx")
+OUTPUT_PATH: pathlib.Path = pathlib.Path("data-lender/spreadsheet.json")
 
 df: pd.DataFrame = pd.read_excel(INPUT_PATH, sheet_name=0)
 
